@@ -19,7 +19,15 @@ class EasyedaApi:
             "Accept-Encoding": "gzip, deflate",
             "Accept": "application/json, text/javascript, */*; q=0.01",
             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-            "User-Agent": f"easyeda2kicad v{__version__}",
+            # EasyEDA's CloudFront WAF 403s any request whose User-Agent contains
+            # "easyeda2kicad" (or "python-requests"), returning an HTML error page
+            # that crashes r.json() with a JSONDecodeError. Use a browser UA the
+            # WAF accepts. Keep the real version in a separate header for telemetry.
+            "User-Agent": (
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/120.0 Safari/537.36"
+            ),
+            "X-Easyeda2Kicad-Version": __version__,
         }
 
     def get_info_from_easyeda_api(self, lcsc_id: str) -> dict:
